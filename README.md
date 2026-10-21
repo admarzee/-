@@ -1,54 +1,67 @@
-<header>
+# تطبيق تسجيل بيانات المركبات — عربي
 
-<!--
-  <<< Author notes: Course header >>>
-  Include a 1280×640 image, course title in sentence case, and a concise description in emphasis.
-  In your repository settings: enable template repository, add your 1280×640 social image, auto delete head branches.
-  Add your open source license, GitHub uses MIT license.
--->
+تطبيق ويب عربي متجاوب، بخادم Node.js وقاعدة بيانات SQLite مركزية على الخادم، ويشمل:
+- نموذج بيانات المركبة مع تحقق في المتصفح والخادم.
+- زر إرسال حقيقي يحفظ الطلب في قاعدة البيانات.
+- منع الرقم الوطني/الإداري نفسه من تقديم طلب جديد خلال 30 يوماً من آخر إرسال ناجح. يُنفذ التحقق في الخادم داخل معاملة قاعدة بيانات، وليس في المتصفح فقط.
+- دخول إدارة بكلمة مرور من متغيرات البيئة وجلسة آمنة نسبياً.
+- لوحة إحصاءات: إجمالي الطلبات، اليوم، الشهر الحالي.
+- بحث وفلاتر تاريخية وصفحات، وتصدير CSV يمكن فتحه في Excel.
+- حماية أساسية عبر Helmet وتحديد معدل الطلبات.
 
-# GitHub Pages
+## المتطلبات
+- Node.js 18 أو أحدث.
+- استضافة تدعم تشغيل Node.js وتخزيناً دائماً لملف قاعدة البيانات.
 
-_Create a site or blog from your GitHub repositories with GitHub Pages._
+## التشغيل محلياً
 
-</header>
+1. فك ضغط المشروع وافتح الطرفية داخل مجلد `vehicle-request-app`.
+2. ثبّت الاعتماديات:
 
-<!--
-  <<< Author notes: Step 1 >>>
-  Choose 3-5 steps for your course.
-  The first step is always the hardest, so pick something easy!
-  Link to docs.github.com for further explanations.
-  Encourage users to open new tabs for steps!
--->
+   ```bash
+   npm install
+   ```
 
-## Step 1: Enable GitHub Pages
+3. عيّن متغيرات البيئة. على Linux/macOS مثلاً:
 
-_Welcome to GitHub Pages and Jekyll :tada:!_
+   ```bash
+   export ADMIN_USER='admin'
+   export ADMIN_PASSWORD='ضع-هنا-كلمة-مرور-قوية-وطويلة'
+   export SESSION_SECRET="$(openssl rand -hex 32)"
+   export NODE_ENV='development'
+   npm start
+   ```
 
-The first step is to enable GitHub Pages on this [repository](https://docs.github.com/en/get-started/quickstart/github-glossary#repository). When you enable GitHub Pages on a repository, GitHub takes the content that's on the main branch and publishes a website based on its contents.
+   في Windows PowerShell:
 
-### :keyboard: Activity: Enable GitHub Pages
+   ```powershell
+   $env:ADMIN_USER='admin'
+   $env:ADMIN_PASSWORD='ضع-هنا-كلمة-مرور-قوية-وطويلة'
+   $env:SESSION_SECRET='ضع-هنا-قيمة-عشوائية-طويلة-لا تقل عن 32 حرفاً'
+   $env:NODE_ENV='development'
+   npm start
+   ```
 
-1. Open a new browser tab, and work on the steps in your second tab while you read the instructions in this tab.
-1. Under your repository name, click **Settings**.
-1. Click **Pages** in the **Code and automation** section.
-1. Ensure "Deploy from a branch" is selected from the **Source** drop-down menu, and then select `main` from the **Branch** drop-down menu.
-1. Click the **Save** button.
-1. Wait about _one minute_ then refresh this page (the one you're following instructions from). [GitHub Actions](https://docs.github.com/en/actions) will automatically update to the next step.
-   > Turning on GitHub Pages creates a deployment of your repository. GitHub Actions may take up to a minute to respond while waiting for the deployment. Future steps will be about 20 seconds; this step is slower.
-   > **Note**: In the **Pages** of **Settings**, the **Visit site** button will appear at the top. Click the button to see your GitHub Pages site.
+4. افتح `http://localhost:3000`.
+5. اضغط «دخول الإدارة والتقارير»، ثم استخدم اسم المستخدم وكلمة المرور اللذين ضبطتهما.
 
-<footer>
+قاعدة البيانات `data.sqlite` تُنشأ تلقائياً في مجلد المشروع ما لم تحدد `DB_PATH`.
 
-<!--
-  <<< Author notes: Footer >>>
-  Add a link to get support, GitHub status page, code of conduct, license link.
--->
+## النشر على الإنترنت
 
----
+- ارفع مجلد المشروع إلى استضافة تدعم Node.js، واضبط أوامر البناء/التشغيل على `npm install` و`npm start`.
+- أضف `ADMIN_USER` و`ADMIN_PASSWORD` و`SESSION_SECRET` كمتغيرات سرية في إعدادات الاستضافة؛ لا تضع كلمة المرور في ملفات الواجهة أو المستودعات العامة.
+- اربط مجلداً دائماً بقاعدة البيانات `data.sqlite`. بعض الاستضافات المؤقتة تمسح الملفات عند إعادة التشغيل؛ لا تستخدمها دون قرص دائم أو انقل قاعدة البيانات إلى PostgreSQL مُدارة.
+- فعّل HTTPS. إعداد الكوكيز الآمن في وضع الإنتاج يعتمد على HTTPS.
+- خذ نسخة احتياطية مشفرة دورياً، وقيّد الوصول إلى لوحة الإدارة.
 
-Get help: [Post in our discussion board](https://github.com/orgs/skills/discussions/categories/github-pages) &bull; [Review the GitHub status page](https://www.githubstatus.com/)
+## قواعد منع التكرار
 
-&copy; 2023 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+المفتاح هو الرقم الوطني أو الإداري بعد إزالة المسافات وتوحيد الأحرف الإنجليزية إلى كبيرة. إذا وجد إرسال ناجح خلال آخر 30 × 24 ساعة، يرفض الخادم الطلب ويعيد وقت السماح التالي. تبدأ المدة من وقت حفظ الطلب بنجاح. إعادة إرسال نفس الرقم بعد انتهاء الفترة مسموحة.
 
-</footer>
+## ملاحظات مهمة قبل الاستخدام الرسمي
+
+- هذا المشروع جاهز للتشغيل بعد تثبيت Node.js والاعتماديات وإعداد بيانات الإدارة، لكنه ليس مستضافاً تلقائياً ولا يملك عنوان إنترنت عاماً حتى تنشره على خادم.
+- تأكد من صلاحية جمع الرقم الوطني/الإداري والاحتفاظ به، وأضف سياسة خصوصية ومدة احتفاظ وحذف حسب تعليمات الجهة المسؤولة.
+- SQLite مناسب كبداية صغيرة أو متوسطة على خادم واحد. عند زيادة الحمل أو تشغيل عدة نسخ من التطبيق، استخدم PostgreSQL ومعاملة/قفل مناسبين لمنع التكرار على كل النسخ.
+- بيانات نموذج الاختبار لا تُضمّن في قاعدة البيانات.
